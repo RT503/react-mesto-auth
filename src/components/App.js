@@ -1,5 +1,7 @@
 import React from 'react';
 import {useEffect} from 'react';
+import { Switch, Route, Redirect } from 'react-router-dom';
+
 import Header from "./Header";
 import Main from "./Main.js";
 import Footer from "./Footer";
@@ -7,11 +9,13 @@ import PopupWithForm from "./PopupWithForm";
 import ImagePopup from "./ImagePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
-
 import api from "../utils/api";
 import {CurrentUserContext} from "../contexts/CurrentUserContext";
 import EditProfilePopup from "./EditProfilePopup";
 
+import Login from "./Login";
+import Register from "./Register";
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
 
@@ -21,6 +25,15 @@ function App() {
     const [selectedCard, setSelectedCard] = React.useState(null);
     const [currentUser, setCurrentUser] = React.useState({});
     const [cards, setCards] = React.useState([]);
+    const [isLoggedIn, setLoggedIn] = React.useState(false);
+
+    function handleLogin() {
+
+    }
+
+    function handleRegister() {
+
+    }
 
 
     function handleEditAvatarClick() {
@@ -118,15 +131,37 @@ function App() {
             <div className="root">
 
                 <Header/>
-                <Main
-                    onEditProfile={handleEditProfileClick}
-                    onAddPlace={handleAddPlaceClick}
-                    onEditAvatar={handleEditAvatarClick}
-                    onCardClick={handleCardClick}
-                    cards={cards}
-                    onCardDelete={handleCardDelete}
-                    onCardLike={handleCardLike}
-                />
+                <Switch>
+                    <ProtectedRoute
+                        path="/"
+                        isLoggedIn={isLoggedIn}
+                        component={Main}
+                        onEditProfile={handleEditProfileClick}
+                        onAddPlace={handleAddPlaceClick}
+                        onEditAvatar={handleEditAvatarClick}
+                        onCardClick={handleCardClick}
+                        cards={cards}
+                        onCardDelete={handleCardDelete}
+                        onCardLike={handleCardLike}
+
+                    />
+                    <Route path="/sign-in">
+                        { isLoggedIn ? <Redirect to="/" /> : <Login onSubmit={handleLogin} setHeaderNavLinkData={setHeaderNavLinkData} />}
+                    </Route>
+                    <Route path="/sign-up">
+                        { isLoggedIn
+                            ? <Redirect to="/" />
+                            : <Register
+                                onSubmit={handleRegister}
+                                setHeaderNavLinkData={setHeaderNavLinkData}
+                                />
+                        }
+                    </Route>
+                    <Route path="*">
+                        <Redirect to="/" />
+                    </Route>
+                </Switch>
+
                 <Footer/>
 
                 <EditProfilePopup
