@@ -33,7 +33,7 @@ function App() {
     const [isInfoPopupOpen, setInfoPopupOpen] = useState(false);
 
     const [isInfoTooltip, setInfoTooltip] = useState({message: '', image: ''});
-    const [headerUserLogin, setHeaderUserLogin] = useState('');
+    const [headerUserLoginEmail, setHeaderUserLoginEmail] = useState('');
 
     function handleLogin({email, password}) {
 
@@ -45,7 +45,7 @@ function App() {
                 if (res.token) {
                     localStorage.setItem('token', res.token);
 
-                    setHeaderUserLogin(email);
+                    setHeaderUserLoginEmail(email);
 
                     setLoggedIn(true);
 
@@ -86,7 +86,7 @@ function App() {
     function handleSignOut() {
         localStorage.removeItem('token');
         setLoggedIn(false);
-        setHeaderUserLogin('');
+        setHeaderUserLoginEmail('');
     }
 
 
@@ -117,8 +117,7 @@ function App() {
     function handleCardDelete(card) {
         api.deleteCard(card)
             .then(() => {
-                const newCards = cards.filter((c) => c._id !== card._id);
-                setCards(newCards);
+                setCards((cards) => cards.filter((c) => c._id !== card._id));
                 closeAllPopups()
             })
             .catch((err) => console.log(`Ошибка удаления карточки ${err}`));
@@ -181,7 +180,7 @@ function App() {
     function handleAddPlaceSubmit({name, link}) {
         api.postCard({name, link})
             .then((card) => {
-                setCards([card, ...cards]);
+                setCards(cards => [card, ...cards]);
                 closeAllPopups()
             }).catch((err) => {
             console.log(err)
@@ -196,7 +195,7 @@ function App() {
             auth.checkUserToken(token)
                 .then((data) => {
                     setLoggedIn(true);
-                    setHeaderUserLogin(data.data.email);
+                    setHeaderUserLoginEmail(data.data.email);
                 })
                 .catch((err) => {
                     console.log(err);
@@ -216,7 +215,7 @@ function App() {
 
                     <Header
                         isLoggedIn={isLoggedIn}
-                        userLogin={headerUserLogin}
+                        userLogin={headerUserLoginEmail}
                         onSignOut={handleSignOut}
                     />
                     <main className="main">
