@@ -1,7 +1,7 @@
 class Api {
     constructor(config) {
         this._url = config.url;
-        this._token = config.authorization;
+        // this._token = config.authorization;
     }
 
 
@@ -16,9 +16,10 @@ class Api {
     getUserInfo() {
         return fetch(`${this._url}/users/me`, {
             method: 'GET',
+            credentials: 'include',
             headers: {
                 authorization: this._token
-            }
+            },
         })
             .then(this._checkResponseData);
     }
@@ -26,6 +27,7 @@ class Api {
     getCards() {
         return fetch(`${this._url}/cards`, {
             method: 'GET',
+            credentials: 'include',
             headers: {
                 authorization: this._token
             }
@@ -41,6 +43,7 @@ class Api {
     patchUserInfo({name, about}) {
         return fetch(`${this._url}/users/me`, {
             method: 'PATCH',
+            credentials: 'include',
             headers: {
                 authorization: this._token,
                 'Content-Type': 'application/json'
@@ -53,6 +56,7 @@ class Api {
     postCard( {name, link} ) {
         return fetch(`${this._url}/cards`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
                 authorization: this._token,
                 'Content-Type': 'application/json'
@@ -68,6 +72,7 @@ class Api {
     deleteCard(cardData) {
         return fetch(`${this._url}/cards/${cardData._id}`, {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
                 authorization: this._token
             }
@@ -79,6 +84,7 @@ class Api {
     likeCard(cardData) {
         return fetch(`${this._url}/cards/likes/${cardData._id}`, {
             method: 'PUT',
+            credentials: 'include',
             headers: {
                 authorization: this._token
             }
@@ -89,6 +95,7 @@ class Api {
     changeLikeCardStatus(id, like) {
         return fetch(`${this._url}/cards/likes/${id}`, {
             method: like ? 'PUT' : 'DELETE',
+            credentials: 'include',
             headers: {
                 authorization: this._token
             }
@@ -100,6 +107,7 @@ class Api {
     unlikeCard(cardData) {
         return fetch(`${this._url}/cards/likes/${cardData._id}`, {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
                 authorization: this._token
             }
@@ -110,6 +118,7 @@ class Api {
     updateAvatar({avatar}) {
         return fetch(`${this._url}/users/me/avatar`, {
             method: 'PATCH',
+            credentials: 'include',
             headers: {
                 authorization: this._token,
                 'Content-Type': 'application/json'
@@ -121,8 +130,7 @@ class Api {
 }
 
 const api = new Api({
-    url: 'https://mesto.nomoreparties.co/v1/cohort-21',
-    authorization: '4f9c484d-5393-4899-94d9-a4e16dfc1364'
+    url: 'https://api.rt503.nomoredomains.monster'
 })
 
 export default api;
