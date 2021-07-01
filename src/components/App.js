@@ -60,6 +60,7 @@ function App() {
                 if (res) {
                     checkToken();
                     getCards();
+                    getUser();
 
                     setHeaderUserLoginEmail(email);
 
@@ -195,6 +196,14 @@ function App() {
                 if (Array.isArray(data)) {
                     setCards(data.reverse());
                 }
+            })
+            .catch(error => console.log(error));
+    }
+
+    function getUser(){
+        api.getUserInfo()
+            .then((user) => {
+                setCurrentUser(user)
             })
             .catch(error => console.log(error));
     }
