@@ -1,38 +1,25 @@
 class Api {
-    constructor(config) {
-        this._url = config.url;
-        // this._token = config.authorization;
+    constructor({url, headers}){
+        this._url = url;
+        this._headers = headers;
     }
-
-
-    _checkResponseData(res) {
-        if (!res.ok) {
-            return Promise.reject(`Ошибка: ${res.status}`);
-        }
-        return res.json();
-    }
-
 
     getUserInfo() {
         return fetch(`${this._url}/users/me`, {
-            method: 'GET',
+            headers: this._headers,
             credentials: 'include',
-            headers: {
-                authorization: this._token
-            },
         })
-            .then(this._checkResponseData);
+            .then(result => {
+                this._getResponseData({ result })
+            });
     }
 
     getCards() {
         return fetch(`${this._url}/cards`, {
-            method: 'GET',
+            headers: this._headers,
             credentials: 'include',
-            headers: {
-                authorization: this._token
-            }
         })
-            .then(this._checkResponseData);
+            .then(result => this._getResponseData({result}));
     }
 
     //get all data
@@ -40,97 +27,66 @@ class Api {
         return Promise.all([this.getUserInfo(), this.getCards()]);
     }
 
-    patchUserInfo({name, about}) {
+    patchUserInfo({ name, about }) {
         return fetch(`${this._url}/users/me`, {
             method: 'PATCH',
+            headers: this._headers,
             credentials: 'include',
-            headers: {
-                authorization: this._token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({name, about})
+            body: JSON.stringify({ name, about })
         })
-            .then(this._checkResponseData);
+            .then(result => this._getResponseData({result}));
     }
 
     postCard( {name, link} ) {
         return fetch(`${this._url}/cards`, {
             method: 'POST',
+            headers: this._headers,
             credentials: 'include',
-            headers: {
-                authorization: this._token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                name: name,
-                link: link
-            })
+            body: JSON.stringify({ name, link })
         })
-            .then(this._checkResponseData);
+            .then(result => this._getResponseData({result}));
     }
 
-    deleteCard(cardData) {
-        return fetch(`${this._url}/cards/${cardData._id}`, {
+    deleteCard({cardId}) {
+        return fetch(`${this._url}/cards/${cardId}`, {
             method: 'DELETE',
             credentials: 'include',
-            headers: {
-                authorization: this._token
-            }
+            headers: this._headers
         })
-            .then(this._checkResponseData);
-
+            .then(result => this._getResponseData({ result }));
     }
 
-    likeCard(cardData) {
-        return fetch(`${this._url}/cards/likes/${cardData._id}`, {
-            method: 'PUT',
+
+    changeLikeCardStatus({cardId, isLiked}){
+
+        return fetch(`${this._url}/cards/${cardId}/likes`, {
+            method: isLiked ? 'PUT' : 'DELETE',
+            headers: this._headers,
             credentials: 'include',
-            headers: {
-                authorization: this._token
-            }
         })
-            .then(this._checkResponseData);
+            .then(result => this._getResponseData({result}));
     }
 
-    changeLikeCardStatus(id, like) {
-        return fetch(`${this._url}/cards/likes/${id}`, {
-            method: like ? 'PUT' : 'DELETE',
-            credentials: 'include',
-            headers: {
-                authorization: this._token
-            }
-        })
-            .then(this._checkResponseData)
+    _getResponseData({result}){
+        return result.ok ? result.json() : '';
     }
 
-
-    unlikeCard(cardData) {
-        return fetch(`${this._url}/cards/likes/${cardData._id}`, {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: {
-                authorization: this._token
-            }
-        })
-            .then(this._checkResponseData);
-    }
-
-    updateAvatar({avatar}) {
+    updateAvatar({ avatar }) {
         return fetch(`${this._url}/users/me/avatar`, {
             method: 'PATCH',
+            headers: this._headers,
             credentials: 'include',
-            headers: {
-                authorization: this._token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({avatar})
+            body: JSON.stringify({ avatar })
         })
-            .then(this._checkResponseData);
+            .then(result => this._getResponseData({result}));
     }
 }
 
 const api = new Api({
-    url: 'https://api.rt503.nomoredomains.monster'
-})
+    url: 'https://api.rt503.nomoredomains.monster',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+});
 
 export default api;

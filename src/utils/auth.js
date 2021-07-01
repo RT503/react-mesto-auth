@@ -10,12 +10,11 @@ export const headers = {
 export function register({ email, password }){
     return fetch(`${BASE_URL}/signup`, {
         method : 'POST',
-        mode: 'cors',
         headers,
+        mode: 'cors',
         body : JSON.stringify({
             email, password
-        }),
-        credentials: 'include',
+        })
     }).then(result => getResponseData(result));
 }
 
@@ -33,10 +32,16 @@ export function login({email, password}){
 
 export function checkUserToken(jwt) {
     return fetch(`${BASE_URL}/users/me`, {
-        headers: {
-            ...headers,
-            'Authorization' : `Bearer ${jwt}`
-        },
+        method: 'GET',
+        credentials: 'include',
+        mode: 'cors',
+    })
+        .then((res) => getResponseData(res))
+}
+
+export function signOut(){
+    return fetch(`${BASE_URL}/signout`, {
+        method: 'DELETE',
         credentials: 'include',
         mode: 'cors',
     })

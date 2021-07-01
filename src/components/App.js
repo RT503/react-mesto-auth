@@ -35,6 +35,21 @@ function App() {
     const [isInfoTooltip, setInfoTooltip] = useState({message: '', image: ''});
     const [headerUserLoginEmail, setHeaderUserLoginEmail] = useState('');
 
+    function checkToken(){
+
+        auth.checkUserToken()
+            .then((data) => {
+                if (data) {
+                    setCurrentUser(data);
+                    setLoggedIn(true);
+                    setHeaderUserLoginEmail(data.email);
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }
+
     function handleLogin({email, password}) {
 
         auth.login({
@@ -42,8 +57,9 @@ function App() {
         })
             .then((res) => {
 
-                if (res.token) {
-                    localStorage.setItem('token', res.token);
+                if (res) {
+                    checkToken();
+                    getCards();
 
                     setHeaderUserLoginEmail(email);
 
@@ -58,6 +74,7 @@ function App() {
                 }
             })
             .catch(() => {
+                setLoggedIn(false);
                 setInfoTooltipError()
                 setInfoPopupOpen(true);
             })
@@ -84,9 +101,12 @@ function App() {
     }
 
     function handleSignOut() {
-        localStorage.removeItem('token');
-        setLoggedIn(false);
-        setHeaderUserLoginEmail('');
+        auth.signOut()
+            .then((res) => {
+                setLoggedIn(false);
+                setHeaderUserLoginEmail('');
+            })
+            .catch((err) => console.log(`Error: ${err}`))
     }
 
 
@@ -141,24 +161,6 @@ function App() {
         setInfoPopupOpen(false);
     }
 
-    useEffect(() => {
-        api.getUserInfo()
-            .then((info) => {
-                setCurrentUser(info);
-            })
-            .catch((err) => console.log(`Ошибка ${err}`))
-    }, [])
-
-    useEffect(() => {
-        api.getCards()
-            .then((data) => {
-                setCards(data);
-            })
-            .catch((err) => {
-                console.log(`Ошибка ${err}`);
-            })
-    }, [])
-
     function handleUpdateUser({name, about}) {
         api.patchUserInfo({name, about})
             .then((data) => {
@@ -187,24 +189,19 @@ function App() {
         })
     }
 
-    function checkTokenInStorage() {
-
-        if (localStorage.getItem('token')) {
-            const token = localStorage.getItem('token');
-
-            auth.checkUserToken(token)
-                .then((data) => {
-                    setLoggedIn(true);
-                    setHeaderUserLoginEmail(data.data.email);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-        }
+    function getCards(){
+        api.getCards()
+            .then((data) => {
+                if (Array.isArray(data)) {
+                    setCards(data.reverse());
+                }
+            })
+            .catch(error => console.log(error));
     }
 
     useEffect(() => {
-        checkTokenInStorage();
+        checkToken();
+        getCards();
     }, [])
 
     return (

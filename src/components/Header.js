@@ -17,7 +17,7 @@ function Header(props) {
                 {props.isLoggedIn &&
                 <>
                     <p className="header__user-login">{props.userLogin}</p>
-                    <Link className="header__link" onClick={props.onSignOut}>Выйти</Link>
+                    <Link to="/" className="header__link" onClick={props.onSignOut}>Выйти</Link>
                 </>
                 }
             </div>
